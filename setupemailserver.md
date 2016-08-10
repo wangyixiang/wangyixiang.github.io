@@ -10,10 +10,9 @@
 下面我们就对应于技术组件来一个一个梳理一下,我们要用到的技术
 1.  SMTP: [postfix]  
 做为MTA, [postfix]要完成别的MTA对它的投递工作, 也要完成对其他MTA的投递工作.  
-
-    **在接受其他MTA的投递的时候:**  
-    对于此MTA我们如何来进行甄别, 这里多管齐下是最有效的, 比如查询黑名单, 看看sender的域名或者发送IP是否在黑名单里或者白名单里, 这里的黑名单不只是本地的黑名单, 一般使用网上的可以提供在线查询的online黑名单系统,  
-    **在向其他MTA投递的时候:**  
+**在接受其他MTA的投递的时候:**  
+对于此MTA我们如何来进行甄别, 这里多管齐下是最有效的, 比如查询黑名单, 看看sender的域名或者发送IP是否在黑名单里或者白名单里, 这里的黑名单不只是本地的黑名单, 一般使用网上的可以提供在线查询的online黑名单系统,  
+**在向其他MTA投递的时候:**  
     
 
 2.  [Greylisting][greylist]:   
@@ -33,7 +32,7 @@ When a request for delivery of a mail is received by Postfix via SMTP, the tripl
 3. [MUA](https://en.wikipedia.org/wiki/Email_client)  
     Mail User Agent, 又名email client
 4. [SMTP Authentication](https://en.wikipedia.org/wiki/SMTP_Authentication)
-5. [Email authentication](https://en.wikipedia.org/wiki/Email_authentication)
+5. [Email Authentication](https://en.wikipedia.org/wiki/Email_authentication)
 6. [Milter](https://en.wikipedia.org/wiki/Milter)
     MTA Extension, 
 7. [DKIM](https://en.wikipedia.org/wiki/DomainKeys_Identified_Mail)  
@@ -66,14 +65,24 @@ Recommended. Prevents use of this domain name for outbound mail by specifying th
     
     上面这个ns1.box.cidanash.com是用来作为Nameserver glue record来把domain name registrar中的NS定向到我们自己搭建的name server上来, 但是我们禁止outbound mail以@ns1.box.cidanash.com来作为域名来进行发送.
 9. [DMARC](https://en.wikipedia.org/wiki/DMARC)  
-    Domain-based Message Authentication, Reporting and Conformance (DMARC) 
-    >_dmarc.box.cidanash.com	TXT	v=DMARC1; p=quarantine
+    Domain-based Message Authentication, Reporting and Conformance, DMARC is built on the SPF and DKIM.
+    >_dmarc.box.cidanash.com	TXT	v=DMARC1; p=quarantine  
 Recommended. Specifies that mail that does not originate from the box but claims to be from @box.cidanash.com or which does not have a valid DKIM signature is suspect and should be quarantined by the recipient's mail system.
 
-    >_dmarc.ns1.box.cidanash.com	TXT	v=DMARC1; p=reject
-Recommended. Prevents use of this domain name for outbound mail by specifying that the SPF rule should be honoured for mail from @ns1.box.cidanash.com.
-10. [Bounce Message](https://en.wikipedia.org/wiki/Bounce_message)
+    >_dmarc.ns1.box.cidanash.com	TXT	v=DMARC1; p=reject  
+Recommended. Prevents use of this domain name for outbound mail by specifying that the SPF rule should be honoured for mail from @ns1.box.cidanash.com.  
 
+   可以看到DMARC正如其名字一样, 在SPF和DKIM的基础上, 它可以给MTA以明确的处理policy, 比如是隔离, 还是拒绝, 还是不管(None), 还是接受. 而且可以设置rua和ruf, 对应Aggregate Report和Forensic Report, 邮寄给对应的人员.
+10. [Bounce Message](https://en.wikipedia.org/wiki/Bounce_message)
+11. [DNSSEC](https://en.wikipedia.org/wiki/Domain_Name_System_Security_Extensions)  
+可惜现在国内的服务商在这块还很跟不上, 而自己搭建DNS也是可以的, 不过国内服务商自定义域名服务器既然还要收10元人民币, 有点抢钱的味道.  
+DNSSEC还是比较复杂的, DNSSEC建立在公钥技术之上, 核心就是利用存在各级域名服务器下的DNSKEY来形成一个chain of trust, 一级一级地保证数据的origin authentication的和数据的integrity, 下面是一个标准的Authenticating an Answer的:  
+getting configured DNSKEY RR for root zone **-->** checking it whether 1) in root DNSKEY RRSet 2) the root DNSKEY is signed with this DNSKEY RR 3) the signature lifetime is valid.  **-->** 如果都满足, all keys in the DNSKEY RRSet are considered authenticated. **-->** using one root DNSKEY RR to authenticate "目标域名" DS RRset.  **-->** if this root DNSKey authenticated the DS RRSet, the resolver will match DS RR with "目标域名"的DNSKEY RRSet, **-->** 如果找到匹配的, the resolver will check whether the "目标域名" DNSKEY RR has signed the "目标域名"的DNSKEY RRSet and the signature lifetime is valid. **-->** 如果满足, 那么all keys in the "目标域名" DNSKEY RRset are considered authenticated. **-->** the resolver 就使用 RR里的algorithm 和 key tag来checks that some DNSKEY RR in the "目标域名". **-->** 这个DNSKEY用于authenticate RRSIG included in the response.  
+可以看到步骤是机器复杂的.
+11. [DANE TLSA](https://en.wikipedia.org/wiki/DNS-based_Authentication_of_Named_Entities)  
+DANE leverages the DNSSEC infrastructure to publish public keys and certificates for use with Transport Layer Security protocol via the "TLSA" DNS RR.
+11. [Opportunistic encryption](https://en.wikipedia.org/wiki/Opportunistic_encryption)  
+when a system attempt to connect to another system, firstly she will attpemt to encrypt the communication's channel otherwise she will fall back to unencrypted communication, this method requires no pre-arrangement between 2 systems.
 
 ###References
 1. [各大免费邮箱邮件群发账户SMTP服务器配置及SMTP发送量限制情况](https://www.freehao123.com/mail-smtp/)
