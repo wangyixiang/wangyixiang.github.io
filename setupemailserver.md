@@ -84,9 +84,17 @@ DANE leverages the DNSSEC infrastructure to publish public keys and certificates
 11. [Opportunistic encryption](https://en.wikipedia.org/wiki/Opportunistic_encryption)  
 when a system attempt to connect to another system, firstly she will attpemt to encrypt the communication's channel otherwise she will fall back to unencrypted communication, this method requires no pre-arrangement between 2 systems.
 
-###References
-1. [各大免费邮箱邮件群发账户SMTP服务器配置及SMTP发送量限制情况](https://www.freehao123.com/mail-smtp/)
-2. [Demystifying SPF, DKIM, and DMARC](https://blog.returnpath.com/demystifying-spf-dkim-and-dmarc/)
+###国内企业邮箱的survey
+收集到的一些评测
+1. [测评：网易、腾讯、35、阿里企业邮箱谁更牛？](http://www.itbear.com.cn/n178237c29.aspx)
+2. [各大免费邮箱邮件群发账户SMTP服务器配置及SMTP发送量限制情况](https://www.freehao123.com/mail-smtp/)
+
+
+其实对国内邮箱的一个问题是政府对个人信息安全的保护的极其不力, 以及对可能的surveillance的恐惧.
+不过我还好, 不过不同人的观点可能会很不一样.
+
+###References 
+1. [Demystifying SPF, DKIM, and DMARC](https://blog.returnpath.com/demystifying-spf-dkim-and-dmarc/)
 
 [dovecot]: http://dovecot.org/ "dovecot official site"
 [intodns]: http://www.intodns.com "intodns"
